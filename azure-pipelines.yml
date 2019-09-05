@@ -1,4 +1,181 @@
 jobs:
+- job: MacOS
+  pool:
+    vmImage: "macOS-10.14"
+  timeoutInMinutes: 180
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.7"
+  - script: |
+      chmod +x .ci/install.sh
+      source ./.ci/install.sh
+      chmod +x .ci/run.sh
+      ./.ci/run.sh
+    env:
+      CONAN_LOGIN_USERNAME: $(CONAN_LOGIN_USERNAME)
+      CONAN_PASSWORD: $(CONAN_PASSWORD)
+      CONAN_APPLE_CLANG_VERSIONS: "10.0"
+  strategy:
+    matrix:
+      Debug:
+        CONAN_BUILD_TYPES: Debug
+      Release:
+        CONAN_BUILD_TYPES: Release
+- job: MinGW
+  pool:
+    vmImage: "windows-latest"
+  timeoutInMinutes: 210
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.7"
+  - script: |
+      pip install conan --upgrade
+      pip install conan_package_tools bincrafters_package_tools
+      conan user
+      python build.py
+    env:
+      CONAN_LOGIN_USERNAME: $(CONAN_LOGIN_USERNAME)
+      CONAN_PASSWORD: $(CONAN_PASSWORD)
+      CONAN_BUILD_REQUIRES: "msys2_installer/latest@bincrafters/stable"
+  strategy:
+    matrix:
+      4.9 x86:
+        MINGW_CONFIGURATIONS: '4.9@x86@dwarf2@posix'
+      4.9 x86_64:
+        MINGW_CONFIGURATIONS: '4.9@x86_64@seh@posix'
+      5 x86:
+        MINGW_CONFIGURATIONS: '5@x86@dwarf2@posix'
+      5 x86_64:
+        MINGW_CONFIGURATIONS: '5@x86_64@seh@posix'
+      6 x86:
+        MINGW_CONFIGURATIONS: '6@x86@dwarf2@posix'
+      6 x86_64:
+        MINGW_CONFIGURATIONS: '6@x86_64@seh@posix'
+      7 x86 Debug:
+        MINGW_CONFIGURATIONS: '7@x86@dwarf2@posix'
+        CONAN_BUILD_TYPES: Debug
+      7 x86_64 Debug:
+        MINGW_CONFIGURATIONS: '7@x86_64@seh@posix'
+        CONAN_BUILD_TYPES: Debug
+      7 x86 Release:
+        MINGW_CONFIGURATIONS: '7@x86@dwarf2@posix'
+        CONAN_BUILD_TYPES: Release
+      7 x86_64 Release:
+        MINGW_CONFIGURATIONS: '7@x86_64@seh@posix'
+        CONAN_BUILD_TYPES: Release
+      8 x86 Debug:
+        MINGW_CONFIGURATIONS: '8@x86@dwarf2@posix'
+        CONAN_BUILD_TYPES: Debug
+      8 x86_64 Debug:
+        MINGW_CONFIGURATIONS: '8@x86_64@seh@posix'
+        CONAN_BUILD_TYPES: Debug
+      8 x86 Release:
+        MINGW_CONFIGURATIONS: '8@x86@dwarf2@posix'
+        CONAN_BUILD_TYPES: Release
+      8 x86_64 Release:
+        MINGW_CONFIGURATIONS: '8@x86_64@seh@posix'
+        CONAN_BUILD_TYPES: Release
+
+- job: Visual
+  pool:
+    vmImage: $(IMAGE_NAME)
+  timeoutInMinutes: 180
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.7"
+  - script: |
+      choco uninstall mingw
+      del /f /s /q C:\Strawberry
+  - script: |
+      pip install conan --upgrade
+      pip install conan_package_tools bincrafters_package_tools
+      conan user
+      python build.py
+    env:
+      CONAN_LOGIN_USERNAME: $(CONAN_LOGIN_USERNAME)
+      CONAN_PASSWORD: $(CONAN_PASSWORD)
+  strategy:
+    matrix:
+      16 2019 x86 Debug:
+        IMAGE_NAME: "windows-2019"
+        CONAN_VISUAL_VERSIONS: 16
+        CONAN_ARCHS: "x86"
+        CONAN_BUILD_TYPES: Debug
+      16 2019 x86 Release:
+        IMAGE_NAME: "windows-2019"
+        CONAN_VISUAL_VERSIONS: 16
+        CONAN_ARCHS: "x86"
+        CONAN_BUILD_TYPES: Release
+      16 2019 x86_64 Debug:
+        IMAGE_NAME: "windows-2019"
+        CONAN_VISUAL_VERSIONS: 16
+        CONAN_ARCHS: "x86_64"
+        CONAN_BUILD_TYPES: Debug
+      16 2019 x86_64 Release:
+        IMAGE_NAME: "windows-2019"
+        CONAN_VISUAL_VERSIONS: 16
+        CONAN_ARCHS: "x86_64"
+        CONAN_BUILD_TYPES: Release
+
+      15 2017 x86 Debug:
+        IMAGE_NAME: "vs2017-win2016"
+        CONAN_VISUAL_VERSIONS: 15
+        CONAN_ARCHS: "x86"
+        CONAN_BUILD_TYPES: Debug
+      15 2017 x86 Release:
+        IMAGE_NAME: "vs2017-win2016"
+        CONAN_VISUAL_VERSIONS: 15
+        CONAN_ARCHS: "x86"
+        CONAN_BUILD_TYPES: Release
+      15 2017 x86_64 Debug:
+        IMAGE_NAME: "vs2017-win2016"
+        CONAN_VISUAL_VERSIONS: 15
+        CONAN_ARCHS: "x86_64"
+        CONAN_BUILD_TYPES: Debug
+      15 2017 x86_64 Release:
+        IMAGE_NAME: "vs2017-win2016"
+        CONAN_VISUAL_VERSIONS: 15
+        CONAN_ARCHS: "x86_64"
+        CONAN_BUILD_TYPES: Release
+
+- job: VisualStudio_14_2015
+  pool:
+    vmImage: "vs2015-win2012r2"
+  timeoutInMinutes: 180
+  steps:
+  - powershell: |
+      Invoke-WebRequest https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64-webinstall.exe -OutFile C:\py3-setup.exe
+      C:\py3-setup.exe /quiet PrependPath=1 InstallAllUsers=1 Include_launcher=1 InstallLauncherAllUsers=1 Include_test=0 Include_doc=0 Include_dev=0 Include_debug=0 Include_tcltk=0 TargetDir=C:\Python37 | Out-Null
+      Write-Host "##vso[task.prependpath]C:\Python37"
+      Write-Host "##vso[task.prependpath]C:\Python37\Scripts"
+    displayName: 'Install Python 3.7'
+  - script: |
+      pip install conan --upgrade
+      pip install conan_package_tools bincrafters_package_tools
+      conan user
+      python build.py
+    env:
+      CONAN_LOGIN_USERNAME: $(CONAN_LOGIN_USERNAME)
+      CONAN_PASSWORD: $(CONAN_PASSWORD)
+      CONAN_VISUAL_VERSIONS: 14
+  strategy:
+    matrix:
+      x86 Debug:
+        CONAN_ARCHS: "x86"
+        CONAN_BUILD_TYPES: Debug
+      x86 Release:
+        CONAN_ARCHS: "x86"
+        CONAN_BUILD_TYPES: Release
+      x86_64 Debug:
+        CONAN_ARCHS: "x86_64"
+        CONAN_BUILD_TYPES: Debug
+      x86_64 Release:
+        CONAN_ARCHS: "x86_64"
+        CONAN_BUILD_TYPES: Release
+
 - job: Linux
   pool:
     vmImage: "ubuntu-16.04"

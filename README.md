@@ -1,7 +1,5 @@
 [![Download](https://api.bintray.com/packages/bincrafters/public-conan/qt%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/qt%3Abincrafters/_latestVersion)
-[![Build Status Travis](https://travis-ci.com/bincrafters/conan-qt.svg?branch=stable%2F5.13.1)](https://travis-ci.com/bincrafters/conan-qt)
 [![Build Status Azure](https://dev.azure.com/bincrafters/packages/_apis/build/status/bincrafters.conan-qt?branchName=stable%2F5.13.1)](https://dev.azure.com/bincrafters/packages/_build)
-[![Build Status AppVeyor](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-qt?branch=stable%2F5.13.1&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-qt)
 
 ## Conan package recipe for [*qt*](https://www.qt.io)
 
