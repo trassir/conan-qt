@@ -395,6 +395,12 @@ class QtConan(ConanFile):
             args.append("-release")
             args.append("-optimize-size")
 
+        if self.settings.compiler != "Visual Studio":
+            from conans.client.build.compiler_flags import libcxx_define
+            _libcxx_define = libcxx_define(compiler=self.settings.compiler, libcxx = self.settings.compiler.libcxx)
+            if _libcxx_define:
+                args.append("-D " + _libcxx_define)
+
         for module in QtConan._submodules:
             if module != 'qtbase' and not getattr(self.options, module) \
                     and os.path.isdir(os.path.join(self.source_folder, 'qt5', QtConan._submodules[module]['path'])):
