@@ -145,12 +145,15 @@ class QtConan(ConanFile):
                 self.build_requires('pkg-config_installer/0.29.2@bincrafters/stable')
         if self.options.qtwebengine:
             # gperf, bison, flex, python >= 2.7.5 & < 3
-            if not tools.which("bison"):
-                self.build_requires("bison_installer/3.3.2@bincrafters/stable")
             if not tools.which("gperf"):
                 self.build_requires("gperf_installer/3.1@conan/stable")
-            if not tools.which("flex"):
-                self.build_requires("flex_installer/2.6.4@bincrafters/stable")
+            if self.settings.os == "Windows":
+                self.build_requires("winflexbison/2.5.21@bincrafters/stable")
+            else:
+                if not tools.which("bison"):
+                    self.build_requires("bison_installer/3.3.2@bincrafters/stable")
+                if not tools.which("flex"):
+                    self.build_requires("flex_installer/2.6.4@bincrafters/stable")
 
             def _check_python_version():
                 # Check if a valid python2 is available in PATH or it will failflex
