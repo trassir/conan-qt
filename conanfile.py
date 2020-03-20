@@ -226,7 +226,7 @@ class QtConan(ConanFile):
         if self.options.with_doubleconversion and not self.options.multiconfiguration:
             self.requires("double-conversion/3.1.5")
         if self.options.with_freetype and not self.options.multiconfiguration:
-            self.requires("freetype/2.10.0")
+            self.requires("freetype/2.10.1")
         if self.options.with_fontconfig:
             self.requires("fontconfig/2.13.91@conan/stable")
         if self.options.with_icu:
@@ -506,6 +506,7 @@ class QtConan(ConanFile):
         if self.settings.os == "Linux":
             if self.options.GUI:
                 args.append("-system-xcb")
+                args.append("-xcb-xlib")
         elif self.settings.os == "Macos":
             args += ["-no-framework"]
         elif self.settings.os == "Android":
@@ -602,4 +603,19 @@ class QtConan(ConanFile):
 
 
     def package_info(self):
+        libs = [
+          "Qt5Core",
+          "Qt5DBus",
+          "Qt5Gui",
+          "Qt5Network",
+          "Qt5OpenGL",
+          "Qt5PrintSupport",
+          "Qt5Sql",
+          "Qt5Svg",
+          "Qt5Widgets",
+          "Qt5X11Extras",
+          "Qt5Xml"
+        ]
+        self.cpp_info.libdirs.append('lib')
+        self.cpp_info.libs = [lib for lib in libs]
         self.env_info.CMAKE_PREFIX_PATH.append(self.package_folder)
